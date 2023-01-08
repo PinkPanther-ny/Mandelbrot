@@ -16,8 +16,8 @@ public class MandelbrotKeyboardControl : MonoBehaviour
     void Update()
     {
         // Zoom in or out with the mouse scroll wheel or the "Q" and "E" keys
-        double zoomSpeedX = (mandelbrot.xMax - mandelbrot.xMin) / zoomSpeed;
-        double zoomSpeedY = (mandelbrot.yMax - mandelbrot.yMin) / zoomSpeed;
+        float zoomSpeedX = (mandelbrot.xMax - mandelbrot.xMin) / zoomSpeed;
+        float zoomSpeedY = (mandelbrot.yMax - mandelbrot.yMin) / zoomSpeed;
 
         if (Input.GetAxis("Mouse ScrollWheel") > 0)
         {
@@ -54,8 +54,8 @@ public class MandelbrotKeyboardControl : MonoBehaviour
         }
 
         // Move the view with the "W", "A", "S", and "D" keys
-        double moveSpeedX = (mandelbrot.xMax - mandelbrot.xMin) / moveSpeed;
-        double moveSpeedY = (mandelbrot.yMax - mandelbrot.yMin) / moveSpeed;
+        float moveSpeedX = (mandelbrot.xMax - mandelbrot.xMin) / moveSpeed;
+        float moveSpeedY = (mandelbrot.yMax - mandelbrot.yMin) / moveSpeed;
 
         if (Input.GetKey(KeyCode.W))
         {

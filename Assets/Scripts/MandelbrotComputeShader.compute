@@ -1,0 +1,121 @@
+// Each #kernel tells which function to compile; you can have many kernels
+#pragma kernel CSMain
+
+// Create a RenderTexture with enableRandomWrite flag and set it
+// with cs.SetTexture
+RWTexture2D<float4> Result;
+
+float width;
+float height;
+int maxIterations;
+int colorMode;
+float xMin;
+float xMax;
+float yMin;
+float yMax;
+float timeSinceLevelLoad;
+bool drawCircle;
+
+float3 HSVToRGB(float h, float s, float v)
+{
+    h = fmod(h, 1.0f);
+    if (h < 0.0f)
+        h += 1.0f;
+
+    float c = v * s;
+    float x = c * (1.0f - abs(fmod(h * 6.0f, 2.0f) - 1.0f));
+    float m = v - c;
+
+    float3 rgb;
+    if (h < 1.0f/6.0f)
+    {
+        rgb = float3(c, x, 0.0f);
+    }
+    else if (h < 2.0f/6.0f)
+    {
+        rgb = float3(x, c, 0.0f);
+    }
+    else if (h < 3.0f/6.0f)
+    {
+        rgb = float3(0.0f, c, x);
+    }
+    else if (h < 4.0f/6.0f)
+    {
+        rgb = float3(0.0f, x, c);
+    }
+    else if (h < 5.0f/6.0f)
+    {
+        rgb = float3(x, 0.0f, c);
+    }
+    else
+    {
+        rgb = float3(c, 0.0f, x);
+    }
+
+    return rgb + m;
+}
+
+[numthreads(8,8,1)]
+void CSMain (uint3 id : SV_DispatchThreadID)
+{
+    float a = xMin + (xMax - xMin) * id.x / width;
+    float b = yMin + (yMax - yMin) * id.y / height;
+    float real = a;
+    float imag = b;
+        
+    int value = 0;
+    for (int i = 0; i < maxIterations; i++)
+    {
+        float r2 = real * real;
+        float i2 = imag * imag;
+        imag = 2 * real * imag + b;
+        real = r2 - i2 + a;
+        if (real * real + imag * imag > 4)
+        {
+            value = i;
+            break;
+        }
+    }
+
+    float hue, saturation, brightness;
+    switch (colorMode)
+    {
+        case 1:
+            hue = (float)value / maxIterations;
+            brightness = 1.0f;
+            saturation = abs(sin((float) value / maxIterations * 3.1415f * 2.0f)) * 5.0f;
+            Result[id.xy] = float4(HSVToRGB(hue, saturation, brightness), 1.0f);
+            break;
+    
+        case 2:
+            hue = (float)value / maxIterations + 0.6f + 0.04f * sin(0.7f * timeSinceLevelLoad);
+            brightness = 0.9f + 0.08f * sin(0.6f * timeSinceLevelLoad);
+            saturation = 0.92f + 0.08f * sin(0.3f * timeSinceLevelLoad);
+            Result[id.xy] = float4(HSVToRGB(hue, saturation, brightness), 1.0f);
+            Result[id.xy] += float4(0, 0.5*id.x / width, 0.5*id.y/height, -0.25f * sin(0.7f * timeSinceLevelLoad));
+        
+            break;
+    
+        default:
+            hue = (float)value / maxIterations + 0.6f + 0.04f * sin(0.7f * timeSinceLevelLoad);
+            brightness = 0.9f + 0.08f * sin(0.6f * timeSinceLevelLoad);
+            saturation = 0.92f + 0.08f * sin(0.3f * timeSinceLevelLoad);
+            Result[id.xy] = float4(HSVToRGB(hue, saturation, brightness), 1.0f);
+            break;
+    }
+
+    if (drawCircle)
+    {
+        // Calculate the distance from the center of the screen
+        const float2 center = float2(width / 2, height / 2);
+        const float distance = length(center - id.xy);
+
+        // If the distance is less than or equal to the radius of the circle
+        // and greater than the radius minus 1, draw a pixel
+        if (distance <= 15.0 && distance > 10.0)
+        {
+            Result[id.xy] = float4(1, 1, 1, 1);
+        }
+    }
+
+}

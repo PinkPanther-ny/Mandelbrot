@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Android;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
@@ -42,10 +43,18 @@ public class GameManager : MonoBehaviour
 
     public void ImageCapture()
     {
-        mandelbrot.SaveRenderTextureToImage();
-        captureText.gameObject.SetActive(true); // display the text
-        captureText.color = Color.red;
-        StartCoroutine(FadeOutText(1f)); // start the fade out coroutine with a duration of 1 second
+        if( !Permission.HasUserAuthorizedPermission( Permission.ExternalStorageWrite ) )
+        {
+            Permission.RequestUserPermission( Permission.ExternalStorageWrite );
+        }
+        else
+        {
+            mandelbrot.SaveRenderTextureToImage();
+            captureText.gameObject.SetActive(true); // display the text
+            captureText.color = Color.red;
+            StartCoroutine(FadeOutText(1f)); // start the fade out coroutine with a duration of 1 second
+        }
+
     }
     
     IEnumerator<float?> FadeOutText(float duration)

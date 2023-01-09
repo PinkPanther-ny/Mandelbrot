@@ -1,84 +1,83 @@
 using UnityEngine;
-using System.Collections;
 
 public class MandelbrotKeyboardControl : MonoBehaviour
 {
-    private Mandelbrot mandelbrot;
+    private Mandelbrot _mandelbrot;
     public int zoomSpeed = 20;
     public int moveSpeed = 20;
     public int addIter = 10;
 
-    void Awake()
+    private void Awake()
     {
-        mandelbrot = GetComponent<Mandelbrot>();
+        _mandelbrot = GetComponent<Mandelbrot>();
     }
 
-    void Update()
+    private void Update()
     {
         // Zoom in or out with the mouse scroll wheel or the "Q" and "E" keys
-        float zoomSpeedX = (mandelbrot.xMax - mandelbrot.xMin) / zoomSpeed;
-        float zoomSpeedY = (mandelbrot.yMax - mandelbrot.yMin) / zoomSpeed;
+        float zoomSpeedX = (_mandelbrot.xMax - _mandelbrot.xMin) / zoomSpeed;
+        float zoomSpeedY = (_mandelbrot.yMax - _mandelbrot.yMin) / zoomSpeed;
 
         if (Input.GetAxis("Mouse ScrollWheel") > 0)
         {
-            mandelbrot.xMin += zoomSpeedX;
-            mandelbrot.xMax -= zoomSpeedX;
-            mandelbrot.yMin += zoomSpeedY;
-            mandelbrot.yMax -= zoomSpeedY;
+            _mandelbrot.xMin += zoomSpeedX;
+            _mandelbrot.xMax -= zoomSpeedX;
+            _mandelbrot.yMin += zoomSpeedY;
+            _mandelbrot.yMax -= zoomSpeedY;
         }
 
         if (Input.GetAxis("Mouse ScrollWheel") < 0)
         {
-            mandelbrot.xMin -= zoomSpeedX;
-            mandelbrot.xMax += zoomSpeedX;
-            mandelbrot.yMin -= zoomSpeedY;
-            mandelbrot.yMax += zoomSpeedY;
+            _mandelbrot.xMin -= zoomSpeedX;
+            _mandelbrot.xMax += zoomSpeedX;
+            _mandelbrot.yMin -= zoomSpeedY;
+            _mandelbrot.yMax += zoomSpeedY;
         }
 
         // Calculate more iteration
         if (Input.GetKeyDown(KeyCode.Q))
         {
-            mandelbrot.maxIterations += addIter;
+            _mandelbrot.maxIterations += addIter;
         }
 
         if (Input.GetKeyDown(KeyCode.E))
         {
-            if (mandelbrot.maxIterations - addIter <= 2)
+            if (_mandelbrot.maxIterations - addIter <= 2)
             {
-                mandelbrot.maxIterations = 2;
+                _mandelbrot.maxIterations = 2;
             }
             else
             {
-                mandelbrot.maxIterations -= addIter;
+                _mandelbrot.maxIterations -= addIter;
             }
         }
 
         // Move the view with the "W", "A", "S", and "D" keys
-        float moveSpeedX = (mandelbrot.xMax - mandelbrot.xMin) / moveSpeed;
-        float moveSpeedY = (mandelbrot.yMax - mandelbrot.yMin) / moveSpeed;
+        float moveSpeedX = (_mandelbrot.xMax - _mandelbrot.xMin) / moveSpeed;
+        float moveSpeedY = (_mandelbrot.yMax - _mandelbrot.yMin) / moveSpeed;
 
         if (Input.GetKey(KeyCode.W))
         {
-            mandelbrot.yMin -= moveSpeedY;
-            mandelbrot.yMax -= moveSpeedY;
+            _mandelbrot.yMin -= moveSpeedY;
+            _mandelbrot.yMax -= moveSpeedY;
         }
 
         if (Input.GetKey(KeyCode.A))
         {
-            mandelbrot.xMin += moveSpeedX;
-            mandelbrot.xMax += moveSpeedX;
+            _mandelbrot.xMin += moveSpeedX;
+            _mandelbrot.xMax += moveSpeedX;
         }
 
         if (Input.GetKey(KeyCode.S))
         {
-            mandelbrot.yMin += moveSpeedY;
-            mandelbrot.yMax += moveSpeedY;
+            _mandelbrot.yMin += moveSpeedY;
+            _mandelbrot.yMax += moveSpeedY;
         }
 
         if (Input.GetKey(KeyCode.D))
         {
-            mandelbrot.xMin -= moveSpeedX;
-            mandelbrot.xMax -= moveSpeedX;
+            _mandelbrot.xMin -= moveSpeedX;
+            _mandelbrot.xMax -= moveSpeedX;
         }
     }
 }

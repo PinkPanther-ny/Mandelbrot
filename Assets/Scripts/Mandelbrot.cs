@@ -10,14 +10,14 @@ public class Mandelbrot : MonoBehaviour
     public float yMin = -1.5f;
     public float yMax = 1.5f;
     
-    private float prevxMin;
-    private float prevxMax;
-    private float prevyMin;
-    private float prevyMax;
-    private bool valuesChanged = false;
+    private float _prevXMin;
+    private float _prevXMax;
+    private float _prevYMin;
+    private float _prevYMax;
+    private bool _valuesChanged;
 
     public int maxIterations = 128;
-    public int colorMode = 0;
+    public int colorMode;
     
     public ComputeShader computeShader;
     public RenderTexture renderTexture;
@@ -26,36 +26,37 @@ public class Mandelbrot : MonoBehaviour
     {
         if (Screen.width > Screen.height)
         {
-            float percent = (float)Screen.width / Screen.height;
-            float newMinX = xMin - (xMax - xMin) * (0.5f * (percent - 1));
-            float newMaxX = xMax + (xMax - xMin) * (0.5f * (percent - 1));
+            var percent = (float)Screen.width / Screen.height;
+            var newMinX = xMin - (xMax - xMin) * (0.5f * (percent - 1));
+            var newMaxX = xMax + (xMax - xMin) * (0.5f * (percent - 1));
             xMin = newMinX;
             xMax = newMaxX;
         }
     
         if (Screen.width < Screen.height)
         {
-            float percent = (float)Screen.height / Screen.width;
-            float newMinY = yMin - (yMax - yMin) * (0.5f * (percent - 1));
-            float newMaxY = yMax + (yMax - yMin) * (0.5f * (percent - 1));
+            var percent = (float)Screen.height / Screen.width;
+            var newMinY = yMin - (yMax - yMin) * (0.5f * (percent - 1));
+            var newMaxY = yMax + (yMax - yMin) * (0.5f * (percent - 1));
             yMin = newMinY;
             yMax = newMaxY;
         }
     }
-    void Update()
+    
+    private void Update()
     {
         // Check if any of the public attributes have changed
-        if (!xMin.Equals(prevxMin) || !xMax.Equals(prevxMax) || !yMin.Equals(prevyMin) || !yMax.Equals(prevyMax))
+        if (!xMin.Equals(_prevXMin) || !xMax.Equals(_prevXMax) || !yMin.Equals(_prevYMin) || !yMax.Equals(_prevYMax))
         {
-            valuesChanged = true;
-            prevxMin = xMin;
-            prevxMax = xMax;
-            prevyMin = yMin;
-            prevyMax = yMax;
+            _valuesChanged = true;
+            _prevXMin = xMin;
+            _prevXMax = xMax;
+            _prevYMin = yMin;
+            _prevYMax = yMax;
         }
         else
         {
-            valuesChanged = false;
+            _valuesChanged = false;
         }
     }
     
@@ -78,7 +79,7 @@ public class Mandelbrot : MonoBehaviour
         computeShader.SetFloat("timeSinceLevelLoad", Time.timeSinceLevelLoad);
         computeShader.SetInt("maxIterations", maxIterations);
         computeShader.SetInt("colorMode", colorMode);
-        computeShader.SetBool("drawCircle", valuesChanged);
+        computeShader.SetBool("drawCircle", _valuesChanged);
         
         computeShader.Dispatch(0, renderTexture.width/8, renderTexture.height/8,1);
         

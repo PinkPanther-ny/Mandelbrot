@@ -58,16 +58,17 @@ float3 HSVToRGB(float h, float s, float v)
 [numthreads(8,8,1)]
 void CSMain (uint3 id : SV_DispatchThreadID)
 {
-    float a = xMin + (xMax - xMin) * id.x / width;
-    float b = yMin + (yMax - yMin) * id.y / height;
+    const float a = xMin + (xMax - xMin) * id.x / width;
+    const float b = yMin + (yMax - yMin) * id.y / height;
     float real = a;
     float imag = b;
-        
+
+    // Calculate mandelbrot set
     int value = 0;
     for (int i = 0; i < maxIterations; i++)
     {
-        float r2 = real * real;
-        float i2 = imag * imag;
+        const float r2 = real * real;
+        const float i2 = imag * imag;
         imag = 2 * real * imag + b;
         real = r2 - i2 + a;
         if (real * real + imag * imag > 4)
@@ -77,6 +78,7 @@ void CSMain (uint3 id : SV_DispatchThreadID)
         }
     }
 
+    // Assign pixel color
     float hue, saturation, brightness;
     switch (colorMode)
     {

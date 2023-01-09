@@ -10,14 +10,14 @@ public class MandelbrotJoystickControl : MonoBehaviour
     public float moveSpeed = 0.3f;
     public int zoomReverseMultiplier = 1;
     public int moveReverseMultiplier = 1;
-    
-    void Awake()
+
+    private void Awake()
     {
         _mandelbrot = GetComponent<Mandelbrot>();
     }
 
     // Update is called once per frame
-    void Update()
+    private void Update()
     {
         if (zoomStick.Vertical > 0 && _mandelbrot.xMax - _mandelbrot.xMin > 1e-4 || (zoomStick.Vertical < 0 && _mandelbrot.xMax - _mandelbrot.xMin < 5e3))
         {

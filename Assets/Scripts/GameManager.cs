@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
@@ -7,6 +8,8 @@ public class GameManager : MonoBehaviour
     public Slider iterSlider; // reference to the slider component
     public Dropdown dropdown;
     public Button resetButton;
+    public Button captureButton;
+    public Text captureText;
     public Mandelbrot mandelbrot;
     
     public void Start()
@@ -19,6 +22,7 @@ public class GameManager : MonoBehaviour
         iterSlider.onValueChanged.AddListener (delegate {ValueChangeCheck ();});
         dropdown.onValueChanged.AddListener (delegate {ValueChangeCheck ();});
         resetButton.onClick.AddListener (Reset);
+        captureButton.onClick.AddListener (ImageCapture);
         
         iterSlider.GetComponentInChildren<Text>().text = "Max Iteration: " + iterSlider.value;
     }
@@ -34,6 +38,26 @@ public class GameManager : MonoBehaviour
     public void Reset()
     {
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+    }
+
+    public void ImageCapture()
+    {
+        mandelbrot.SaveRenderTextureToImage();
+        captureText.gameObject.SetActive(true); // display the text
+        captureText.color = Color.red;
+        StartCoroutine(FadeOutText(1f)); // start the fade out coroutine with a duration of 1 second
+    }
+    
+    IEnumerator<float?> FadeOutText(float duration)
+    {
+        float elapsedTime = 0;
+        Color originalColor = captureText.color;
+        while (elapsedTime < duration)
+        {
+            elapsedTime += Time.deltaTime;
+            captureText.color = Color.Lerp(originalColor, Color.clear, elapsedTime / duration);
+            yield return null;
+        }
     }
     
     private void Update()

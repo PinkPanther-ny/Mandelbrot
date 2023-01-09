@@ -1,4 +1,8 @@
+using System;
+using System.Collections;
+using System.IO;
 using UnityEngine;
+
 
 public class Mandelbrot : MonoBehaviour
 {
@@ -85,4 +89,35 @@ public class Mandelbrot : MonoBehaviour
         
         Graphics.Blit(renderTexture, dest);
     }
+
+    public void SaveRenderTextureToImage()
+    {
+        StartCoroutine(SaveRenderTextureToImageCoroutine());
+    }
+    
+    private IEnumerator SaveRenderTextureToImageCoroutine()
+    {
+        // Wait for end of frame
+        yield return new WaitForEndOfFrame();
+
+        // Create a texture to save the render texture data
+        Texture2D texture = new Texture2D(renderTexture.width, renderTexture.height, TextureFormat.RGB24, false);
+
+        // Read the render texture data into the texture
+        RenderTexture.active = renderTexture;
+        texture.ReadPixels(new Rect(0, 0, renderTexture.width, renderTexture.height), 0, 0);
+        texture.Apply();
+
+        // Encode the texture data into a png file
+        byte[] bytes = texture.EncodeToPNG();
+        File.WriteAllBytes("Mandelbrot" + Guid.NewGuid().ToString("N").Substring(0, 8) + ".png", bytes);
+
+#if UNITY_ANDROID
+        // Save the png file to the device's gallery
+        string path = "Mandelbrot" + Guid.NewGuid().ToString("N").Substring(0, 8) + ".png";
+        AndroidJavaClass classObject = new AndroidJavaClass("com.alvin.mandelbrot.GallerySaver");
+        classObject.CallStatic("SaveImage", path);
+#endif
+    }
+
 }
